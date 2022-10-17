@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Canvas = ({ canvas }) => {
+const Canvas = ({ canvas, history, setHistory }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [end, setEnd] = useState({ x: 0, y: 0 });
@@ -8,40 +8,46 @@ const Canvas = ({ canvas }) => {
   useEffect(() => {
     if (!canvas.current) return;
     const ctx = canvas.current.getContext("2d");
-    //ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
-    // draw the line
+    ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
     ctx.closePath();
     ctx.stroke();
-  }, []);
+
+    history.map((data) => {
+      ctx.beginPath();
+      ctx.moveTo(data.start.x, data.start.y);
+      ctx.lineTo(data.end.x, data.end.y);
+      ctx.closePath();
+      ctx.stroke();
+    });
+  }, [canvas, start, end, history]);
+
+  const setCordinatesData = (e) => {
+    return {
+      x: e.nativeEvent.offsetX,
+      y: e.nativeEvent.offsetY,
+    };
+  };
 
   const mousedown = (e) => {
     e.preventDefault();
     setIsDrawing(true);
-    setStart({
-      x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY,
-    });
-    setEnd({
-      x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY,
-    });
+    setStart(setCordinatesData(e));
+    setEnd(setCordinatesData(e));
   };
 
   function mousemove(e) {
     e.preventDefault();
     if (!isDrawing) return;
 
-    setEnd({
-      x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY,
-    });
+    setEnd(setCordinatesData(e));
   }
   function mouseup(e) {
     e.preventDefault();
     setIsDrawing(false);
+    setHistory([...history, { start, end }]);
   }
 
   return (
