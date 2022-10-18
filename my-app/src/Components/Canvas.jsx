@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { intersection } from "./functions";
 
-const Canvas = ({ canvas, history, setHistory, crossPoint, setCrossPoint }) => {
+const Canvas = ({
+  canvas,
+  history,
+  setHistory,
+  crossPoint,
+  setCrossPoint,
+  isAnimated,
+}) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [end, setEnd] = useState({ x: 0, y: 0 });
@@ -15,21 +22,24 @@ const Canvas = ({ canvas, history, setHistory, crossPoint, setCrossPoint }) => {
     ctx.lineTo(end.x, end.y);
     ctx.closePath();
     ctx.stroke();
+    ctx.restore();
 
     history.map((data) => {
       ctx.beginPath();
-      ctx.moveTo(data.start.x, data.start.y);
-      ctx.lineTo(data.end.x, data.end.y);
+      ctx.moveTo(data?.start.x, data?.start.y);
+      ctx.lineTo(data?.end.x, data?.end.y);
       ctx.closePath();
       ctx.stroke();
     });
-    onMouveCrossPoint(ctx);
-    crossPoint.map((data) => {
-      ctx.beginPath();
-      ctx.fillStyle = "red";
-      ctx.fillRect(data.x - 5, data.y - 5, 10, 10);
-      ctx.stroke();
-    });
+
+    !isAnimated && onMouveCrossPoint(ctx);
+    !isAnimated &&
+      crossPoint.map((data) => {
+        ctx.beginPath();
+        ctx.fillStyle = "red";
+        ctx.fillRect(data.x - 5, data.y - 5, 10, 10);
+        ctx.stroke();
+      });
   }, [canvas, start, end, history]);
 
   const setCordinatesData = (e) => {
