@@ -1,6 +1,6 @@
 export const intersection = (
   p0x: number,
-  p0y,
+  p0y: number,
   p1x: number,
   p1y: number,
   p2x: number,

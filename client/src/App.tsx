@@ -28,7 +28,7 @@ function App() {
   };
 
   const setCutLine = (): void => {
-    let newHistory: LineCoordinateObj[] = [];
+    let newHistory: any = [];
 
     newHistory = history.map((data: LineCoordinateObj) => {
       let lengthLine: number =
@@ -57,7 +57,7 @@ function App() {
       };
     });
 
-    //setHistory(newHistory);
+    setHistory(newHistory);
   };
 
   return (

@@ -3,14 +3,16 @@ import { intersection } from "./functions";
 import { CoordinateObj, LineCoordinateObj } from "./types";
 import React from "react";
 
-const Canvas = ({
-  canvas,
-  history,
-  setHistory,
-  crossPoint,
-  setCrossPoint,
-  isAnimated,
+const Canvas = (props: {
+  canvas: any;
+  history: LineCoordinateObj[];
+  setHistory: any;
+  crossPoint: CoordinateObj[];
+  setCrossPoint: any;
+  isAnimated: boolean;
 }) => {
+  const { canvas, history, setHistory, crossPoint, setCrossPoint, isAnimated } =
+    props;
   const [isDrawing, setIsDrawing] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [end, setEnd] = useState({ x: 0, y: 0 });
@@ -24,7 +26,6 @@ const Canvas = ({
     ctx.lineTo(end.x, end.y);
     ctx.closePath();
     ctx.stroke();
-    ctx.restore();
 
     history.map((data: LineCoordinateObj) => {
       ctx.beginPath();
@@ -70,9 +71,8 @@ const Canvas = ({
     addCrossPoint();
   };
 
-  const getDataCrossPoint = (): LineCoordinateObj[] => {
-    let crossPointResult = [];
-    crossPointResult = history.map((data: LineCoordinateObj) =>
+  const getDataCrossPoint = (): any => {
+    let crossPointResult: any = history.map((data) =>
       intersection(
         data.start.x,
         data.start.y,
@@ -84,9 +84,7 @@ const Canvas = ({
         end.y
       )
     );
-    crossPointResult = crossPointResult.filter((el) => {
-      return el != null;
-    });
+    crossPointResult = crossPointResult.filter((el: any) => el);
     return crossPointResult;
   };
 
