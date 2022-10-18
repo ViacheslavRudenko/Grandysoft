@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import { intersection } from "./functions";
 import { CoordinateObj, LineCoordinateObj } from "./types";
 import React from "react";
@@ -46,7 +46,7 @@ const Canvas = (props: {
   }, [canvas, start, end, history]);
 
   const setCordinatesData = (
-    e: React.MouseEvent<HTMLButtonElement>
+    e: MouseEvent<HTMLButtonElement>
   ): CoordinateObj => {
     return {
       x: e.nativeEvent.offsetX,
@@ -72,7 +72,7 @@ const Canvas = (props: {
   };
 
   const getDataCrossPoint = (): any => {
-    let crossPointResult: any = history.map((data) =>
+    let crossPointResult = history.map((data) =>
       intersection(
         data.start.x,
         data.start.y,
@@ -84,7 +84,8 @@ const Canvas = (props: {
         end.y
       )
     );
-    crossPointResult = crossPointResult.filter((el: any) => el);
+
+    crossPointResult = crossPointResult.filter((el) => el);
     return crossPointResult;
   };
 
