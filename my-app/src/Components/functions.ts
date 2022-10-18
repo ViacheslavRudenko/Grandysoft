@@ -1,4 +1,13 @@
-export const intersection = (p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y) => {
+export const intersection = (
+  p0x: number,
+  p0y,
+  p1x: number,
+  p1y: number,
+  p2x: number,
+  p2y: number,
+  p3x: number,
+  p3y: number
+): null | { x: number; y: number } => {
   var d1x = p1x - p0x,
     d1y = p1y - p0y,
     d2x = p3x - p2x,

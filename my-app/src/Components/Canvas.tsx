@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { intersection } from "./functions";
+import { CoordinateObj, LineCoordinateObj } from "./types";
+import React from "react";
 
 const Canvas = ({
   canvas,
@@ -24,7 +26,7 @@ const Canvas = ({
     ctx.stroke();
     ctx.restore();
 
-    history.map((data) => {
+    history.map((data: LineCoordinateObj) => {
       ctx.beginPath();
       ctx.moveTo(data?.start.x, data?.start.y);
       ctx.lineTo(data?.end.x, data?.end.y);
@@ -34,7 +36,7 @@ const Canvas = ({
 
     !isAnimated && onMouveCrossPoint(ctx);
     !isAnimated &&
-      crossPoint.map((data) => {
+      crossPoint.map((data: CoordinateObj) => {
         ctx.beginPath();
         ctx.fillStyle = "red";
         ctx.fillRect(data.x - 5, data.y - 5, 10, 10);
@@ -42,36 +44,35 @@ const Canvas = ({
       });
   }, [canvas, start, end, history]);
 
-  const setCordinatesData = (e) => {
+  const setCordinatesData = (
+    e: React.MouseEvent<HTMLButtonElement>
+  ): CoordinateObj => {
     return {
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY,
     };
   };
 
-  const mousedown = (e) => {
-    e.preventDefault();
+  const mousedown = (e: any): void => {
     setIsDrawing(true);
     setStart(setCordinatesData(e));
     setEnd(setCordinatesData(e));
   };
 
-  const mousemove = (e) => {
-    e.preventDefault();
+  const mousemove = (e: any): void => {
     if (!isDrawing) return;
-
     setEnd(setCordinatesData(e));
   };
 
-  const mouseup = (e) => {
+  const mouseup = (): void => {
     setIsDrawing(false);
     setHistory([...history, { start, end }]);
     addCrossPoint();
   };
 
-  const getDataCrossPoint = () => {
+  const getDataCrossPoint = (): LineCoordinateObj[] => {
     let crossPointResult = [];
-    crossPointResult = history.map((data) =>
+    crossPointResult = history.map((data: LineCoordinateObj) =>
       intersection(
         data.start.x,
         data.start.y,
@@ -89,8 +90,9 @@ const Canvas = ({
     return crossPointResult;
   };
 
-  const onMouveCrossPoint = (ctx) => {
-    getDataCrossPoint().map((data) => {
+  const onMouveCrossPoint = (ctx: CanvasRenderingContext2D): void => {
+    const crossPointData = getDataCrossPoint();
+    crossPointData.map((data: any) => {
       ctx.beginPath();
       ctx.fillStyle = "red";
       ctx.fillRect(data.x - 5, data.y - 5, 10, 10);

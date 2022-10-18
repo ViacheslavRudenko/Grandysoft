@@ -1,14 +1,15 @@
 import "./App.css";
+import React from "react";
 import { Box, Button } from "@mui/material";
-
 import Canvas from "./Components/Canvas";
 import { useEffect, useRef, useState } from "react";
+import { CoordinateObj, LineCoordinateObj } from "./Components/types";
 
 function App() {
   const [history, setHistory] = useState([]);
   const [crossPoint, setCrossPoint] = useState([]);
   const [isAnimated, setIsAnimated] = useState(false);
-  const [timer, setTimer] = useState();
+
   const canvas = useRef();
 
   useEffect(() => {
@@ -21,18 +22,16 @@ function App() {
   };
 
   const setTiner = () => {
-    setTimer(
-      setTimeout(() => {
-        setCutLine();
-        if (timer > 100) return;
-      }, 20)
-    );
+    setTimeout(() => {
+      setCutLine();
+    }, 20);
   };
 
-  const setCutLine = () => {
-    let newHistory = [];
-    newHistory = history.map((data) => {
-      let lengthLine =
+  const setCutLine = (): void => {
+    let newHistory: LineCoordinateObj[] = [];
+
+    newHistory = history.map((data: LineCoordinateObj) => {
+      let lengthLine: number =
         Math.pow(data.end.x - data.start.x, 2) +
         Math.pow(data.end.y - data.start.y, 2);
 
@@ -41,7 +40,7 @@ function App() {
         setHistory([]);
       }
 
-      const vector = {
+      const vector: CoordinateObj = {
         x: data.end.x - data.start.x,
         y: data.end.y - data.start.y,
       };
@@ -58,7 +57,7 @@ function App() {
       };
     });
 
-    setHistory(newHistory);
+    //setHistory(newHistory);
   };
 
   return (
