@@ -20,12 +20,17 @@ const Canvas = (props: {
   useEffect(() => {
     if (!canvas.current) return;
     const ctx = canvas.current.getContext("2d");
-    ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
-    ctx.closePath();
-    ctx.stroke();
+
+    if (isDrawing) {
+      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.closePath();
+      ctx.stroke();
+    } else {
+      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
+    }
 
     history.map((data: LineCoordinateObj) => {
       ctx.beginPath();
