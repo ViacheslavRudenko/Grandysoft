@@ -1,4 +1,3 @@
-import "./App.css";
 import React from "react";
 import { Box, Button } from "@mui/material";
 import Canvas from "./Components/Canvas";
@@ -13,18 +12,15 @@ function App() {
   const canvas = useRef();
 
   useEffect(() => {
-    isAnimated && setTiner();
+    isAnimated &&
+      setTimeout(() => {
+        setCutLine();
+      }, 20);
   }, [isAnimated, history]);
 
   const onCollapse = () => {
     setCrossPoint([]);
     setIsAnimated(true);
-  };
-
-  const setTiner = () => {
-    setTimeout(() => {
-      setCutLine();
-    }, 20);
   };
 
   const setCutLine = (): void => {
