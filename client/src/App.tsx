@@ -3,19 +3,29 @@ import { Box, Button } from "@mui/material";
 import Canvas from "./Components/Canvas";
 import { useEffect, useRef, useState } from "react";
 import { CoordinateObj, LineCoordinateObj } from "./Components/types";
+import { count } from "console";
 
 function App() {
   const [history, setHistory] = useState([]);
   const [crossPoint, setCrossPoint] = useState([]);
   const [isAnimated, setIsAnimated] = useState(false);
+  const [count, setCount] = useState(0);
 
   const canvas = useRef();
 
   useEffect(() => {
-    isAnimated &&
-      setTimeout(() => {
+    if (isAnimated) {
+      let timer = setTimeout(() => {
         setCutLine();
       }, 20);
+
+      if (100 === count) {
+        clearTimeout(timer);
+        setIsAnimated(false);
+        setHistory([]);
+        setCount(0);
+      }
+    }
   }, [isAnimated, history]);
 
   const onCollapse = () => {
@@ -25,33 +35,25 @@ function App() {
 
   const setCutLine = (): void => {
     let newHistory: any = [];
-
-    newHistory = history.map((data: LineCoordinateObj) => {
-      let lengthLine: number =
-        Math.pow(data.end.x - data.start.x, 2) +
-        Math.pow(data.end.y - data.start.y, 2);
-
-      if (lengthLine < 0.1) {
-        setIsAnimated(false);
-        setHistory([]);
-      }
-
-      const vector: CoordinateObj = {
-        x: data.end.x - data.start.x,
-        y: data.end.y - data.start.y,
-      };
-
-      return {
-        start: {
-          x: data.start.x + vector.x / 50,
-          y: data.start.y + vector.y / 50,
-        },
-        end: {
-          x: data.end.x - vector.x / 50,
-          y: data.end.y - vector.y / 50,
-        },
-      };
-    });
+    setCount(count + 1);
+    newHistory = history
+      .map((data: LineCoordinateObj, index) => {
+        const vector: CoordinateObj = {
+          x: data.end.x - data.start.x,
+          y: data.end.y - data.start.y,
+        };
+        return {
+          start: {
+            x: data.start.x + vector.x / 50,
+            y: data.start.y + vector.y / 50,
+          },
+          end: {
+            x: data.end.x - vector.x / 50,
+            y: data.end.y - vector.y / 50,
+          },
+        };
+      })
+      .filter((e) => e);
 
     setHistory(newHistory);
   };
