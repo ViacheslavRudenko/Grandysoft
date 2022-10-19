@@ -1,25 +1,12 @@
 import { MouseEvent } from "react";
 import { intersection } from "./functions";
-import { CoordinateObj, LineCoordinateObj } from "./types";
+import { CoordinateObj, LineCoordinateObj } from "../types";
 import React, { Component } from "react";
-
-interface MyProps {
-  history: [];
-  crossPoint: [];
-  isAnimated: boolean;
-  count: Number;
-  updateState: any;
-}
-
-interface MyState {
-  isDrawing: boolean;
-  start: { x: number; y: number };
-  end: { x: number; y: number };
-}
+import { MyProps, MyState } from "./types";
 
 class Canvas extends Component<MyProps, MyState> {
   private canvas: any;
-  constructor(props: any) {
+  constructor(props: MyProps) {
     super(props);
     this.canvas = React.createRef();
   }
@@ -108,7 +95,7 @@ class Canvas extends Component<MyProps, MyState> {
     this.addCrossPoint();
   };
 
-  getDataCrossPoint = (): any => {
+  getDataCrossPoint = (): (CoordinateObj | null)[] => {
     let crossPointResult = this.props.history.map((data: LineCoordinateObj) =>
       intersection(
         data.start.x,

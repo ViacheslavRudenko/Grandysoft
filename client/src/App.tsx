@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Box, Button } from "@mui/material";
-import Canvas from "./Components/Canvas";
+import Canvas from "./Components/Canvas/Canvas";
 import { CoordinateObj, LineCoordinateObj } from "./Components/types";
 
 class App extends Component {
@@ -29,7 +29,7 @@ class App extends Component {
   };
 
   setCutLine = (): void => {
-    let newHistory: any = [];
+    let newHistory: LineCoordinateObj[] = [];
     this.setState({ count: +this.state.count + 1 });
     newHistory = this.state.history
       .map((data: LineCoordinateObj) => {
