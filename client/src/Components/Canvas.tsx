@@ -1,38 +1,61 @@
-import { useEffect, useState, MouseEvent } from "react";
+import { MouseEvent } from "react";
 import { intersection } from "./functions";
 import { CoordinateObj, LineCoordinateObj } from "./types";
-import React from "react";
+import React, { Component } from "react";
 
-const Canvas = (props: {
-  canvas: any;
-  history: LineCoordinateObj[];
-  setHistory: any;
-  crossPoint: CoordinateObj[];
-  setCrossPoint: any;
+interface MyProps {
+  history: [];
+  crossPoint: [];
   isAnimated: boolean;
-}) => {
-  const { canvas, history, setHistory, crossPoint, setCrossPoint, isAnimated } =
-    props;
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [start, setStart] = useState({ x: 0, y: 0 });
-  const [end, setEnd] = useState({ x: 0, y: 0 });
+  count: Number;
+  updateState: any;
+}
 
-  useEffect(() => {
-    if (!canvas.current) return;
-    const ctx = canvas.current.getContext("2d");
+interface MyState {
+  isDrawing: boolean;
+  start: { x: number; y: number };
+  end: { x: number; y: number };
+}
 
-    if (isDrawing) {
-      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
+class Canvas extends Component<MyProps, MyState> {
+  private canvas: any;
+  constructor(props: any) {
+    super(props);
+    this.canvas = React.createRef();
+  }
+
+  state = {
+    isDrawing: false,
+    start: { x: 0, y: 0 },
+    end: { x: 0, y: 0 },
+  };
+
+  componentDidUpdate() {
+    if (!this.canvas.current) return;
+    const ctx = this.canvas.current.getContext("2d");
+
+    if (this.state.isDrawing) {
+      ctx.clearRect(
+        0,
+        0,
+        this.canvas.current.width,
+        this.canvas.current.height
+      );
       ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      ctx.lineTo(end.x, end.y);
+      ctx.moveTo(this.state.start.x, this.state.start.y);
+      ctx.lineTo(this.state.end.x, this.state.end.y);
       ctx.closePath();
       ctx.stroke();
     } else {
-      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
+      ctx.clearRect(
+        0,
+        0,
+        this.canvas.current.width,
+        this.canvas.current.height
+      );
     }
 
-    history.map((data: LineCoordinateObj) => {
+    this.props.history.map((data: LineCoordinateObj) => {
       ctx.beginPath();
       ctx.moveTo(data?.start.x, data?.start.y);
       ctx.lineTo(data?.end.x, data?.end.y);
@@ -40,53 +63,62 @@ const Canvas = (props: {
       ctx.stroke();
     });
 
-    !isAnimated && onMouveCrossPoint(ctx);
-    !isAnimated &&
-      crossPoint.map((data: CoordinateObj) => {
+    !this.props.isAnimated && this.onMouveCrossPoint(ctx);
+    !this.props.isAnimated &&
+      this.props.crossPoint.map((data: CoordinateObj) => {
         ctx.beginPath();
         ctx.fillStyle = "red";
         ctx.fillRect(data.x - 5, data.y - 5, 10, 10);
         ctx.stroke();
       });
-  }, [canvas, start, end, history]);
+  }
 
-  const setCordinatesData = (
-    e: MouseEvent<HTMLButtonElement>
-  ): CoordinateObj => {
+  setCordinatesData = (e: MouseEvent<HTMLButtonElement>): CoordinateObj => {
     return {
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY,
     };
   };
 
-  const mousedown = (e: any): void => {
-    setIsDrawing(true);
-    setStart(setCordinatesData(e));
-    setEnd(setCordinatesData(e));
+  mousedown = (e: any): void => {
+    this.setState({
+      isDrawing: true,
+      start: this.setCordinatesData(e),
+      end: this.setCordinatesData(e),
+    });
   };
 
-  const mousemove = (e: any): void => {
-    if (!isDrawing) return;
-    setEnd(setCordinatesData(e));
+  mousemove = (e: any): void => {
+    if (!this.state.isDrawing) return;
+    this.setState({
+      end: this.setCordinatesData(e),
+    });
   };
 
-  const mouseup = (): void => {
-    setIsDrawing(false);
-    setHistory([...history, { start, end }]);
-    addCrossPoint();
+  mouseup = (): void => {
+    this.setState({
+      isDrawing: false,
+    });
+
+    this.props.updateState("history", [
+      ...this.props.history,
+      { start: this.state.start, end: this.state.end },
+    ]);
+
+    this.addCrossPoint();
   };
 
-  const getDataCrossPoint = (): any => {
-    let crossPointResult = history.map((data) =>
+  getDataCrossPoint = (): any => {
+    let crossPointResult = this.props.history.map((data: LineCoordinateObj) =>
       intersection(
         data.start.x,
         data.start.y,
         data.end.x,
         data.end.y,
-        start.x,
-        start.y,
-        end.x,
-        end.y
+        this.state.start.x,
+        this.state.start.y,
+        this.state.end.x,
+        this.state.end.y
       )
     );
 
@@ -94,8 +126,8 @@ const Canvas = (props: {
     return crossPointResult;
   };
 
-  const onMouveCrossPoint = (ctx: CanvasRenderingContext2D): void => {
-    const crossPointData = getDataCrossPoint();
+  onMouveCrossPoint = (ctx: CanvasRenderingContext2D): void => {
+    const crossPointData = this.getDataCrossPoint();
     crossPointData.map((data: any) => {
       ctx.beginPath();
       ctx.fillStyle = "red";
@@ -104,22 +136,26 @@ const Canvas = (props: {
     });
   };
 
-  const addCrossPoint = () => {
-    setCrossPoint([...crossPoint, ...getDataCrossPoint()]);
+  addCrossPoint = () => {
+    this.props.updateState("crossPoint", [
+      ...this.props.crossPoint,
+      ...this.getDataCrossPoint(),
+    ]);
   };
 
-  return (
-    <canvas
-      id="canvas"
-      ref={canvas}
-      onMouseDown={mousedown}
-      onMouseMove={mousemove}
-      onMouseUp={mouseup}
-      width="700"
-      height="400"
-      style={{ border: "1px solid red", margin: "0 auto", display: "block" }}
-    ></canvas>
-  );
-};
-
+  render() {
+    return (
+      <canvas
+        id="canvas"
+        ref={this.canvas}
+        onMouseDown={this.mousedown}
+        onMouseMove={this.mousemove}
+        onMouseUp={this.mouseup}
+        width="700"
+        height="400"
+        style={{ border: "1px solid red", margin: "0 auto", display: "block" }}
+      ></canvas>
+    );
+  }
+}
 export default Canvas;

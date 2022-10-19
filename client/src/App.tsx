@@ -1,43 +1,38 @@
-import React from "react";
+import React, { Component } from "react";
 import { Box, Button } from "@mui/material";
 import Canvas from "./Components/Canvas";
-import { useEffect, useRef, useState } from "react";
 import { CoordinateObj, LineCoordinateObj } from "./Components/types";
-import { count } from "console";
 
-function App() {
-  const [history, setHistory] = useState([]);
-  const [crossPoint, setCrossPoint] = useState([]);
-  const [isAnimated, setIsAnimated] = useState(false);
-  const [count, setCount] = useState(0);
-
-  const canvas = useRef();
-
-  useEffect(() => {
-    if (isAnimated) {
-      let timer = setTimeout(() => {
-        setCutLine();
-      }, 20);
-
-      if (100 === count) {
-        clearTimeout(timer);
-        setIsAnimated(false);
-        setHistory([]);
-        setCount(0);
-      }
-    }
-  }, [isAnimated, history]);
-
-  const onCollapse = () => {
-    setCrossPoint([]);
-    setIsAnimated(true);
+class App extends Component {
+  state: { history: []; crossPoint: []; isAnimated: boolean; count: Number } = {
+    history: [],
+    crossPoint: [],
+    isAnimated: false,
+    count: 0,
   };
 
-  const setCutLine = (): void => {
+  componentDidUpdate() {
+    if (this.state.isAnimated) {
+      let timer = setTimeout(() => {
+        this.setCutLine();
+      }, 20);
+
+      if (100 === this.state.count) {
+        clearTimeout(timer);
+        this.setState({ isAnimated: false, history: [], count: 0 });
+      }
+    }
+  }
+
+  onCollapse = () => {
+    this.setState({ crossPoint: [], isAnimated: true });
+  };
+
+  setCutLine = (): void => {
     let newHistory: any = [];
-    setCount(count + 1);
-    newHistory = history
-      .map((data: LineCoordinateObj, index) => {
+    this.setState({ count: +this.state.count + 1 });
+    newHistory = this.state.history
+      .map((data: LineCoordinateObj) => {
         const vector: CoordinateObj = {
           x: data.end.x - data.start.x,
           y: data.end.y - data.start.y,
@@ -55,26 +50,24 @@ function App() {
       })
       .filter((e) => e);
 
-    setHistory(newHistory);
+    this.setState({ history: newHistory });
+  };
+  updateState = (sateName: string, value: any) => {
+    this.setState({ [sateName]: value });
   };
 
-  return (
-    <Box p={2}>
-      <Canvas
-        canvas={canvas}
-        history={history}
-        setHistory={setHistory}
-        crossPoint={crossPoint}
-        setCrossPoint={setCrossPoint}
-        isAnimated={isAnimated}
-      />
-      <Box width="fit-content" m="0 auto" mt={5} border="1px solid red">
-        <Button onClick={onCollapse} disabled={isAnimated}>
-          Collapse lines
-        </Button>
+  render() {
+    return (
+      <Box p={2}>
+        <Canvas {...this.state} updateState={this.updateState} />
+        <Box width="fit-content" m="0 auto" mt={5} border="1px solid red">
+          <Button onClick={this.onCollapse} disabled={this.state.isAnimated}>
+            Collapse lines
+          </Button>
+        </Box>
       </Box>
-    </Box>
-  );
+    );
+  }
 }
 
 export default App;
